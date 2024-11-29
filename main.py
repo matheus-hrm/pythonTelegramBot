@@ -29,7 +29,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     elif data.startswith(CallbackTypes.CHAPTER.value):
         chapter_id = data.replace(CallbackTypes.CHAPTER.value, "")
-        await handle_page_selection(update, query, context, chapter_id)
+        await handle_page_selection(query, context, chapter_id)
 
     elif data.startswith(CallbackTypes.PAGE.value):
         await handle_page_navigation(query, context)
@@ -96,7 +96,7 @@ async def handle_chapter_list_navigation(
     elif data == "next":
         offset = offset + 10
     elif data == "last":
-        offset = 200
+        offset = 100
 
     context.user_data["chapter_offset"] = offset
     print(offset, language, manga_id)
@@ -157,8 +157,6 @@ async def handle_page_selection(
             "Chapter not found, try changing the language source"
         )
         return
-
-    print(pages)
 
     media = InputMediaPhoto(media=pages[0])
     await query.edit_message_media(media=media)
@@ -288,7 +286,7 @@ async def change_quality(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 "High Quality", callback_data=f"{CallbackTypes.QUALITY.value}data"
             ),
             InlineKeyboardButton(
-                "Low Quality", callback_data=f"{CallbackTypes.QUALITY.values}dataSaver"
+                "Low Quality", callback_data=f"{CallbackTypes.QUALITY.value}dataSaver"
             ),
         ]
     ]
@@ -299,12 +297,11 @@ async def change_quality(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 async def handle_quality_selection(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
+    query: CallbackQuery, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
-    query = update.callback_query
-    quality = query.data
+    quality = query.data.replace(CallbackTypes.QUALITY.value, "")
     context.user_data["quality"] = quality
-    await update.message.reply_text(f"Quality changed to {quality}")
+    await query.edit_message_text(f"Quality changed to {quality}")
 
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

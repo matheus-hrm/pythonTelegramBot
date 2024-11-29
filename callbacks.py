@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class CallbackTypes(Enum):
     MANGA = "manga_"
     CHAPTER = "chapter_"
